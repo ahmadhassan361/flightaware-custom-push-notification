@@ -109,7 +109,7 @@ def sendNotification(tk, message, typeSche):
     }
     headers = {
         "accept": "application/json",
-        "Authorization": "Basic YTMyMjQyMjMtZmJjYS00MWI1LThkMGItMjgxZGZhZGQ1NzM3",
+        "Authorization": "Basic OGJlMDhjMzAtMDI2Ni00NGMzLTlkZDktOGE1ZWM3NzQyZGQz",
         "content-type": "application/json",
     }
 
