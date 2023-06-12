@@ -150,38 +150,40 @@ def enable_flight_track(request, flight, token):
         print(data)
         if data["progress_percent"] is not None:
             # check departure not yet on time
-            if data["progress_percent"] >= 0 and sDelayed in data["status"]:
-                print("in departure not yet & delayed")
-                departure_time = datetime.strptime(
-                    data["estimated_out"], "%Y-%m-%dT%H:%M:%SZ"
-                ).replace(tzinfo=timezone.utc)
-                time_difference = departure_time - current_time
-                time_difference_minutes = int(time_difference.total_seconds() / 60)
-                if time_difference_minutes >= 15:
-                    print("schedule 2")
-                    schedule_flight_notifify(
-                        typeSchedule["4"],
-                        flight,
-                        token,
-                        schedule=timezone.timedelta(
-                            minutes=time_difference_minutes - 15
-                        ),
-                    )
-                else:
-                    print("schedule 1")
-                    schedule_flight_notifify(
-                        typeSchedule["1"],
-                        flight,
-                        token,
-                        schedule=timezone.timedelta(
-                            minutes=time_difference_minutes + 3
-                        ),
-                    )
+            # if data["progress_percent"] > 0 :
+            #     departure_time = datetime.strptime(
+            #         data["estimated_out"], "%Y-%m-%dT%H:%M:%SZ"
+            #     ).replace(tzinfo=timezone.utc)
+            #     time_difference = departure_time - current_time
+            #     time_difference_minutes = int(time_difference.total_seconds() / 60)
+            #     if time_difference_minutes >= 15:
+            #         print("schedule 2")
+            #         schedule_flight_notifify(
+            #             typeSchedule["4"],
+            #             flight,
+            #             token,
+            #             schedule=timezone.timedelta(
+            #                 minutes=time_difference_minutes - 15
+            #             ),
+            #         )
+            #     else:
+            #         print("schedule 1")
+            #         schedule_flight_notifify(
+            #             typeSchedule["1"],
+            #             flight,
+            #             token,
+            #             schedule=timezone.timedelta(
+            #                 minutes=time_difference_minutes + 3
+            #             ),
+            #         )
 
-            elif data["progress_percent"] == 0 and Scheduled in data["status"]:
+            if data["progress_percent"] == 0 and (Scheduled in data["status"] or sDelayed in data['status'] or Delayed in data['status']):
                 print("in departure not yet")
+                timeSh = data["scheduled_out"]
+                if data['estimated_out'] is not None:
+                    timeSh = data['estimated_out']
                 departure_time = datetime.strptime(
-                    data["scheduled_out"], "%Y-%m-%dT%H:%M:%SZ"
+                    timeSh, "%Y-%m-%dT%H:%M:%SZ"
                 ).replace(tzinfo=timezone.utc)
                 time_difference = departure_time - current_time
                 time_difference_minutes = int(time_difference.total_seconds() / 60)
@@ -202,7 +204,7 @@ def enable_flight_track(request, flight, token):
                         flight,
                         token,
                         schedule=timezone.timedelta(
-                            minutes=time_difference_minutes + 3
+                            minutes=time_difference_minutes + 4
                         ),
                     )
 
@@ -239,7 +241,7 @@ def enable_flight_track(request, flight, token):
                         typeSchedule["2"],
                         flight,
                         token,
-                        schedule=timezone.timedelta(minutes=time_difference_minutes),
+                        schedule=timezone.timedelta(minutes=time_difference_minutes+4),
                     )
             return Response({"success": True, "message": "Alert Scheduled"})
         else:
