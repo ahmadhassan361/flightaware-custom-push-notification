@@ -21,6 +21,6 @@ from django.views.decorators.csrf import csrf_exempt
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('callback/', csrf_exempt(callback), name='callback'),
-    path('schedule-notification/<str:flight>/<str:token>', csrf_exempt(enable_flight_track), name='enable_flight_track'),
+    path('schedule-notification/<str:flight>/<str:token>/<str:zone>', csrf_exempt(enable_flight_track), name='enable_flight_track'),
     path('delete-schedule-notification/<str:flight>/<str:token>', csrf_exempt(deleteSchedule), name='delete_flight_track')
 ]

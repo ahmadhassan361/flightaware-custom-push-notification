@@ -521,10 +521,11 @@ def callback(request):
 
 
 @api_view(["POST"])
-def enable_flight_track(request, flight, token):
+def enable_flight_track(request, flight, token,zone):
     res = get_flight_status(flight)
     print(res)
-    timezone_rec = request.POST.get('timezone',None)
+    print(zone)
+    timezone_rec = zone.replace("-","/")
     if res is not None and flight is not None and token is not None:
         current_time = timezone.now()
 
@@ -578,6 +579,7 @@ def enable_flight_track(request, flight, token):
                 time = data["scheduled_in"]
                 if data["estimated_in"] is not None:
                     time = data["estimated_in"]
+                print(time)
                 departure_time = datetime.strptime(time, "%Y-%m-%dT%H:%M:%SZ").replace(
                     tzinfo=timezone.utc
                 )
