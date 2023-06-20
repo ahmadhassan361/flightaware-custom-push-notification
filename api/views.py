@@ -156,18 +156,18 @@ def enable_flight_track(request, flight, token,zone):
         data = res["flights"][0]
         print(data)
         if data["progress_percent"] is not None:
-            if data["progress_percent"] == 0 and (Scheduled in data["status"] or sDelayed in data['status'] or Delayed in data['status']):
+            if data["progress_percent"] == 0 or (Scheduled in data["status"] or sDelayed in data['status'] or Delayed in data['status']):
                 print("in departure not yet")
-                timeSh = data["scheduled_out"]
-                if data['estimated_out'] is not None:
-                    timeSh = data['estimated_out']
+                timeSh = data["scheduled_off"]
+                if data['estimated_off'] is not None:
+                    timeSh = data['estimated_off']
                 departure_time = datetime.strptime(
                     timeSh, "%Y-%m-%dT%H:%M:%SZ"
                 ).replace(tzinfo=timezone.utc)
                 time_difference = departure_time - current_time
                 time_difference_minutes = int(time_difference.total_seconds() / 60)
                 if time_difference_minutes >= 15:
-                    print("schedule 1")
+                    print("schedule before departure")
                     schedule_flight_notifify(
                         typeSchedule["4"],
                         flight,
@@ -179,7 +179,7 @@ def enable_flight_track(request, flight, token,zone):
                         
                     )
                 else:
-                    print("schedule 1")
+                    print("schedule departure")
                     schedule_flight_notifify(
                         typeSchedule["1"],
                         flight,
@@ -252,11 +252,11 @@ def schedule_flight_notifify(typeSche, flight, token,timezone_rec):
             if data["progress_percent"] == 0 or (
                 Scheduled in data["status"] or sDelayed in data["status"]
             ):
-                result = sendNotification(token, data, typeSchedule["4"],timezone_rec)
+                sendNotification(token, data, typeSchedule["4"],timezone_rec)
 
-                time = data["scheduled_out"]
-                if data["estimated_out"] is not None:
-                    time = data["estimated_out"]
+                time = data["scheduled_off"]
+                if data["estimated_off"] is not None:
+                    time = data["estimated_off"]
                 departure_time = datetime.strptime(time, "%Y-%m-%dT%H:%M:%SZ").replace(
                     tzinfo=timezone.utc
                 )
@@ -270,7 +270,7 @@ def schedule_flight_notifify(typeSche, flight, token,timezone_rec):
                     schedule=timezone.timedelta(minutes=(time_difference_minutes + 5)),
                 )
 
-        if typeSchedule["1"] == typeSche:
+        elif typeSchedule["1"] == typeSche:
             if data["progress_percent"] > 0 or (
                 Enroute in data["status"]
                 or OnTime in data["status"]
@@ -279,10 +279,10 @@ def schedule_flight_notifify(typeSche, flight, token,timezone_rec):
                 or enDelay in data["status"]
                 or Taxing in data['status']
             ):
-                result = sendNotification(token, data, typeSchedule["1"],timezone_rec)
-                time = data["scheduled_out"]
-                if data["estimated_out"] is not None:
-                    time = data["estimated_out"]
+                sendNotification(token, data, typeSchedule["1"],timezone_rec)
+                time = data["scheduled_in"]
+                if data["estimated_in"] is not None:
+                    time = data["estimated_in"]
                 departure_time = datetime.strptime(time, "%Y-%m-%dT%H:%M:%SZ").replace(
                     tzinfo=timezone.utc
                 )
@@ -304,7 +304,27 @@ def schedule_flight_notifify(typeSche, flight, token,timezone_rec):
                         flight,
                         token,
                         timezone_rec,
-                        schedule=timezone.timedelta(minutes=time_difference_minutes),
+                        schedule=timezone.timedelta(minutes=time_difference_minutes+4),
+                    )
+            else:
+                print("in departure not yet")
+                timeSh = data["scheduled_off"]
+                if data['estimated_off'] is not None:
+                    timeSh = data['estimated_off']
+                departure_time = datetime.strptime(
+                    timeSh, "%Y-%m-%dT%H:%M:%SZ"
+                ).replace(tzinfo=timezone.utc)
+                time_difference = departure_time - current_time
+                time_difference_minutes = int(time_difference.total_seconds() / 60)
+                print("schedule departure")
+                schedule_flight_notifify(
+                        typeSchedule["1"],
+                        flight,
+                        token,
+                        timezone_rec,
+                        schedule=timezone.timedelta(
+                            minutes=time_difference_minutes + 4
+                        ),
                     )
         elif typeSchedule["2"] == typeSche:
             if data["progress_percent"] == 100:
