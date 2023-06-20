@@ -304,7 +304,7 @@ def schedule_flight_notifify(typeSche, flight, token,timezone_rec):
                         flight,
                         token,
                         timezone_rec,
-                        schedule=timezone.timedelta(minutes=time_difference_minutes+4),
+                        schedule=timezone.timedelta(minutes=time_difference_minutes+3),
                     )
             else:
                 print("in departure not yet")
@@ -323,7 +323,7 @@ def schedule_flight_notifify(typeSche, flight, token,timezone_rec):
                         token,
                         timezone_rec,
                         schedule=timezone.timedelta(
-                            minutes=time_difference_minutes + 4
+                            minutes=4
                         ),
                     )
         elif typeSchedule["2"] == typeSche:
@@ -343,7 +343,7 @@ def schedule_flight_notifify(typeSche, flight, token,timezone_rec):
                     flight,
                     token,
                     timezone_rec,
-                    schedule=timezone.timedelta(minutes=(time_difference_minutes + 5)),
+                    schedule=timezone.timedelta(minutes=5),
                 )
         elif typeSchedule["3"] == typeSche:
             sendNotification(token, data, typeSchedule["3"],timezone_rec)
